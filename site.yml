@@ -13,7 +13,19 @@
     - blog
     - ircbouncer
     - xmpp
-    - owncloud
+    - role: nextcloud
+      tags: ['nextcloud']
+      nextcloud_trusted_domain:
+        - "cloud.{{ domain }}"
+      nextcloud_webroot: "/var/www/nextcloud"
+      nextcloud_data_dir: "/decrypted/nextcloud-data"
+      nextcloud_db_backend: "pgsql"
+      nextcloud_admin_name: "admin"
+      nextcloud_tls_cert_method: "installed"
+      nextcloud_tls_cert: "/etc/letsencrypt/live/{{ domain }}/cert.pem"
+      nextcloud_tls_cert_key: "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
+      nextcloud_tls_cert_chain: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+      nextcloud_mozilla_modern_ssl_profile: true
     - vpn
     - tarsnap
     - news
