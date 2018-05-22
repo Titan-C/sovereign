@@ -62,3 +62,7 @@
 
 - name: Start redis
   service: name=redis-server state=started
+
+- name: Configure rspamd to let logs through
+  template: src=etc_rspamd_rspamd.conf.local.j2 dest=/etc/rspamd/rspamd.conf.local
+  notify: restart rspamd

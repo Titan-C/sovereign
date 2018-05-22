@@ -2,5 +2,5 @@
   tags: monit
 - import_tasks: logwatch.yml
   tags: logwatch
-- import_tasks: collectd.yml
-  tags: collectd
+#- import_tasks: collectd.yml
+  #tags: collectd

@@ -35,22 +35,7 @@ mail_virtual_aliases:
     destination: "{{ admin_email }}"
     domain_pk_id: 1
 
-# znc
-irc_nick: (required)
-irc_ident: (required)
-irc_realname: (required)
-irc_quitmsg: (required)
-irc_password: TODO
-
-# xmpp
-prosody_admin: "{{ admin_email }}"
-prosody_virtual_domain: "{{ domain }}"
-prosody_accounts:
-  - name: "{{ main_user_name }}"
-    password: TODO
 
 # openvpn
 openvpn_clients:
   - laptop
-  - phone
-  - tablet

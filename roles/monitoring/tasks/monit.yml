@@ -31,6 +31,6 @@
     - pgsql
     - postfix
     - sshd
-    - tomcat
+    #- tomcat
   notify: restart monit
 

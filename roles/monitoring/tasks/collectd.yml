@@ -1,5 +1,6 @@
 - name: Install collectd
   apt: pkg=collectd state=present
+  install_recommends: no
   tags:
       - dependencies
 

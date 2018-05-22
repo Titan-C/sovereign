@@ -7,12 +7,14 @@
   gather_facts: True
 
   roles:
-    - common
-    - mailserver
-    - webmail
-    - blog
-    - ircbouncer
-    - xmpp
+    - { role: common, tags: ['common', 'letsencrypt']}
+    - { role: mailserver, tags: ['mailserver'] }
+    - { role: vpn, tags: ['vpn'] }
+    - { role: git, tags: ['git'] }
+    #- webmail
+    #- blog
+    #- ircbouncer
+    #- xmpp
     - role: nextcloud
       tags: ['nextcloud']
       nextcloud_trusted_domain:
@@ -26,9 +28,7 @@
       nextcloud_tls_cert_key: "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
       nextcloud_tls_cert_chain: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
       nextcloud_mozilla_modern_ssl_profile: true
-    - vpn
-    - tarsnap
-    - news
-    - git
-    - readlater
+    #- tarsnap
+    #- news
+    #- readlater
     - monitoring  # Monitoring role should be last. See roles/monitoring/README.md
