@@ -1,28 +1,169 @@
+# {{ ansible_managed }}
+# based on https://github.com/Oefenweb/ansible-fail2ban/blob/master/templates/etc/fail2ban/jail.local.j2
 [DEFAULT]
-ignoreip  = 127.0.0.1 {{ ansible_default_ipv4.address }} {{ ' '.join(friendly_networks) }}
-bantime   = 86400
-destemail = {{ admin_email }}
-banaction = iptables-multiport
-action    = %(action_)s
 
+#
+# MISCELLANEOUS OPTIONS
+#
+
+# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
+# ban a host which matches an address in this list. Several addresses can be
+# defined using space separator.
+ignoreip  = 127.0.0.1 {{ ansible_default_ipv4.address }} {{ ' '.join(friendly_networks) }}
+
+# "bantime" is the number of seconds that a host is banned.
+bantime   = 86400
+
+#
+# ACTIONS
+#
+
+# Some options used for actions
+
+# Destination email address used solely for the interpolations in
+# jail.{conf,local,d/*} configuration files.
+destemail = {{ admin_email }}
+
+# Sender email address used solely for some actions
+sender = root@localhost
+
+
+#
+# Action shortcuts. To be used to define action parameter
+
+banaction = iptables-multiport
+
+# The simplest action to take: ban only
+action_ = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+
+# ban & send an e-mail with whois report to the destemail.
+action_mw = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+            %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", protocol="%(protocol)s", chain="%(chain)s"]
+
+# ban & send an e-mail with whois report and relevant log lines
+# to the destemail.
+action_mwl = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+             %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s"]
+
+# See the IMPORTANT note in action.d/xarf-login-attack for when to use this action
+#
+# ban & send a xarf e-mail to abuse contact of IP address and include relevant log lines
+# to the destemail.
+action_xarf = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+             xarf-login-attack[service=%(__name__)s, sender="%(sender)s", logpath=%(logpath)s, port="%(port)s"]
+
+# ban IP on CloudFlare & send an e-mail with whois report and relevant log lines
+# to the destemail.
+action_cf_mwl = cloudflare[cfuser="%(cfemail)s", cftoken="%(cfapikey)s"]
+                %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s"]
+
+# Report block via blocklist.de fail2ban reporting service API
+#
+# See the IMPORTANT note in action.d/blocklist_de.conf for when to
+# use this action. Create a file jail.d/blocklist_de.local containing
+# [Init]
+# blocklist_de_apikey = {api key from registration]
+#
+action_blocklist_de  = blocklist_de[email="%(sender)s", service=%(filter)s, apikey="%(blocklist_de_apikey)s"]
+
+# Report ban via badips.com, and use as blacklist
+#
+# See BadIPsAction docstring in config/action.d/badips.py for
+# documentation for this action.
+#
+# NOTE: This action relies on banaction being present on start and therefore
+# should be last action defined for a jail.
+#
+action_badips = badips.py[category="%(name)s", banaction="%(banaction)s"]
+
+# Choose default action.  To change, just override value of 'action' with the
+# interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
+# globally (section [DEFAULT]) or per specific section
+action    = %(action_mwl)s
+
+
+#
 # JAILS
-[ssh]
+#
+
+#
+# SSH servers
+#
+
+[sshd]
 enabled   = true
 maxretry  = 3
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
 
 [pam-generic]
 enabled   = true
 banaction = iptables-allports
 
-[ssh-ddos]
-enabled   = true
 
-[apache]
+
+#
+# HTTP servers
+#
+
+[apache-badbots]
+# Ban hosts which agent identifies spammer robots crawling the web
+# for email addresses. The mail outputs are buffered.
+enabled  = true
+port     = http,https
+filter   = apache-badbots
+logpath  = %(apache_access_log)s
+bantime  = 172800
+maxretry = 1
+
+
+[apache-overflows]
+enabled  = true
+port     = http,https
+filter   = apache-overflows
+logpath  = %(apache_error_log)s
+maxretry = 2
+
+
+[apache-nohome]
+enabled  = true
+port     = http,https
+logpath  = %(apache_error_log)s
+filter   = apache-nohome
+maxretry = 2
+
+[php-url-fopen]
 enabled = true
+port    = http,https
+filter  = php-url-fopen
+logpath = /var/log/apache*/*access.log
+
+#
+# Web Applications
+#
+#
+
+[monit]
+#Ban clients brute-forcing the monit gui login
+enabled = true
+filter   = monit
+port = 2812
+logpath  = /var/log/monit.log
+
+#
+# Mail servers
+#
 
 [postfix]
 enabled  = true
 maxretry = 1
+
+
+# dovecot defaults to logging to the mail syslog facility
+# but can be set by syslog_facility in the dovecot configuration.
+[dovecot]
+enabled = true
 
 [dovecot-pop3imap]
 enabled = true
