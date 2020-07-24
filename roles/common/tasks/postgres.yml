@@ -1,11 +1,17 @@
 ---
 # Defines tasks applicable for postgreSQL
 
+- name: "[ENV] include OS static vars"
+  include_vars: '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+  when: ansible_facts['distribution_release'] == 'focal'
+
+
 - name: Install Postgres
-  apt: pkg={{ item }} state=present
-  with_items:
-    - postgresql
-    - python-psycopg2
+  apt:
+    name:
+      - postgresql
+      - "{{ _psycopg2 }}"
+    state: present
   tags:
     - dependencies
 

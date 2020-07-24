@@ -32,3 +32,8 @@ ntp_servers:
   # - 1.north-america.pool.ntp.org
   # - 2.north-america.pool.ntp.org
   # - 3.north-america.pool.ntp.org
+
+db_admin_username: 'postgres'
+db_admin_password: "{{ lookup('password', secret + '/' + 'db_admin_password', length=32) }}"
+
+_psycopg2: python-psycopg2
