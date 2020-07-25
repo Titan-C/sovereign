@@ -85,11 +85,3 @@
     - imaps
     - pop3s
   tags: ufw
-
-- name: Update post-certificate-renewal task
-  copy:
-    content: "#!/bin/bash\n\nservice dovecot restart\n"
-    dest: /etc/letsencrypt/postrenew/dovecot.sh
-    mode: 0755
-    owner: root
-    group: root
