@@ -2,10 +2,6 @@
 ## LDA specific settings (also used by LMTP)
 ##
 
-# Address to use when sending rejection mails.
-# Default is postmaster@<your domain>.
-postmaster_address = postmaster@{{domain}}
-
 # Hostname to use in various parts of sent mails, eg. in Message-Id.
 # Default is the system's real hostname.
 hostname = {{ mail_server_hostname }}
@@ -32,7 +28,7 @@ hostname = {{ mail_server_hostname }}
 #recipient_delimiter = +
 
 # Header where the original recipient address (SMTP's RCPT TO: address) is taken
-# from if not available elsewhere. With dovecot-lda -a parameter overrides this. 
+# from if not available elsewhere. With dovecot-lda -a parameter overrides this.
 # A commonly used header for this is X-Original-To.
 #lda_original_recipient_header =
 
