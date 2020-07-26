@@ -15,9 +15,17 @@ append_dot_mydomain = no
 
 readme_directory = no
 
+# See http://www.postfix.org/COMPATIBILITY_README.html -- default to 2 on
+# fresh installs.
+compatibility_level = 2
+
 # antispam
 smtpd_helo_required = yes
-smtpd_helo_restrictions = permit_mynetworks, reject_invalid_hostname
+smtpd_helo_restrictions =
+  permit_mynetworks,
+  reject_non_fqdn_helo_hostname,
+  reject_invalid_helo_hostname,
+  permit
 smtpd_sender_restrictions = reject_unknown_address
 disable_vrfy_command = yes
 strict_rfc821_envelopes = yes
@@ -59,17 +67,11 @@ smtpd_sasl_auth_enable = yes
 broken_sasl_auth_clients = yes
 smtpd_sasl_security_options = noanonymous
 
-# set to empty value for backwards compatibility
-# as per http://www.postfix.org/postconf.5.html#smtpd_relay_restrictions
-smtpd_relay_restrictions =
 
 smtpd_recipient_restrictions =
   permit_sasl_authenticated,
   permit_mynetworks,
   reject_unauth_pipelining,
-  reject_unauth_destination,
-  reject_invalid_hostname,
-  reject_non_fqdn_hostname,
   reject_non_fqdn_recipient,
   reject_unknown_recipient_domain,
   permit
