@@ -26,10 +26,12 @@
     - dependencies
 
 - name: Install Rspamd and Redis
-  apt: pkg={{ item }} state=present update_cache=yes
-  with_items:
-    - rspamd
-    - redis-server
+  apt:
+    name:
+      - rspamd
+      - redis-server
+    state: present
+    update_cache: yes
   tags:
     - dependencies
 

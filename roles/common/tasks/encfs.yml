@@ -1,9 +1,10 @@
 - name: Install encfs & fuse
-  apt: pkg={{ item }} state=present
-  with_items:
-    - encfs
-    - fuse
-    - libfuse-dev
+  apt:
+    name:
+      - encfs
+      - fuse
+      - libfuse-dev
+    state: present
   tags:
     - dependencies
 

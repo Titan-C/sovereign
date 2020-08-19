@@ -1,21 +1,21 @@
 
 - name: Install cgit dependencies
-  apt: pkg={{ item }} state=present
-  with_items:
+  apt:
+    name:
     - groff
     - libssl-dev
     - libz-dev
+    state: present
   tags:
     - dependencies
 
 - name: Install cgit pip dependencies python 3
   pip:
-    name: "{{ item }}"
-    executable: pip3
-  with_items:
+    name:
     - docutils
     - pygments
     - markdown
+    executable: pip3
 
 - name: Download cgit release
   get_url: url=http://git.zx2c4.com/cgit/snapshot/cgit-{{ cgit_version }}.tar.xz

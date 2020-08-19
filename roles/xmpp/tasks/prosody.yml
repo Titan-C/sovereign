@@ -9,10 +9,11 @@
     - dependencies
 
 - name: Install Prosody and dependencies from official repository
-  apt: pkg={{ item }} update_cache=yes
-  with_items:
-    - prosody
-    - lua-sec
+  apt:
+    name:
+      - prosody
+      - lua-sec
+    update_cache: yes
   tags:
     - dependencies
 
